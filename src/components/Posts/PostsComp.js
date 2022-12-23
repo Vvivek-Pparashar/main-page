@@ -3,10 +3,9 @@ import { useSelector } from "react-redux";
 import { Spin, Row, Col } from "antd";
 import PostComp from "./Post/PostComp";
 
-const PostsComp = ({setCurrentID}) => {
+const PostsComp = ({ setCurrentID, setChangeState, changeState }) => {
   const posts = useSelector((state) => state.posts);
 
-  console.log(posts);
   return !posts.length ? (
     <Spin
       style={{
@@ -19,7 +18,12 @@ const PostsComp = ({setCurrentID}) => {
     <Row gutter={[16, 24]}>
       {posts.map((post) => (
         <Col key={post._id} span={9} offset={2}>
-          <PostComp post={post} setCurrentID={setCurrentID} />
+          <PostComp
+            post={post}
+            setCurrentID={setCurrentID}
+            setChangeState={setChangeState}
+            changeState={changeState}
+          />
         </Col>
       ))}
     </Row>

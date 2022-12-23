@@ -9,18 +9,17 @@ import "./App.css";
 
 const { Content } = Layout;
 
-console.log("start")
 
 const App = () => {
+
   const [currentID, setCurrentID] = useState(null);
+  const [changeState, setChangeState] = useState(0);
   const dispatch = useDispatch();
-  let posts = useSelector((state) => state.posts);
 
-  console.log("vivek", posts.length)
-
+  console.log(changeState);
   useEffect(() => {
     dispatch(getPosts());
-  }, [currentID, dispatch, posts.length]);
+  }, [currentID, dispatch, changeState]);
 
   return (
     <Layout>
@@ -31,14 +30,23 @@ const App = () => {
             span={14}
             style={{ height: "100%", minHeight: "100vh", padding: "40px 0" }}
           >
-            <PostsComp setCurrentID={setCurrentID} />
+            <PostsComp
+              setCurrentID={setCurrentID}
+              setChangeState={setChangeState}
+              changeState={changeState}
+            />
           </Col>
           <Col
             span={7}
             offset={2}
             style={{ height: "30vw", position: "sticky", top: "90px" }}
           >
-            <FormComp currentID={currentID} setCurrentID={setCurrentID} />
+            <FormComp
+              currentID={currentID}
+              setCurrentID={setCurrentID}
+              setChangeState={setChangeState}
+              changeState={changeState}
+            />
           </Col>
         </Row>
       </Content>

@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Button, Form, Input } from "antd";
+import { Button, Form, Input, message } from "antd";
 import { useDispatch } from "react-redux";
 import { createPost, updatePost } from "../api";
 import FileBase64 from "react-file-base64";
 
-const FormComp = ({ currentID, setCurrentID }) => {
+const FormComp = ({ currentID, setCurrentID, changeState, setChangeState }) => {
   const post = useSelector((state) =>
     currentID ? state.posts.find((p) => p._id === currentID) : null
   );
+
+  const [messageApi, contextHolder] = message.useMessage();
 
   const [postData, setPostData] = useState({
     company_name: "",
@@ -37,6 +39,7 @@ const FormComp = ({ currentID, setCurrentID }) => {
   };
 
   const handleSubmit = () => {
+    setChangeState(changeState + 1);
     if (currentID) {
       dispatch(updatePost(currentID, postData));
     } else {
@@ -45,6 +48,7 @@ const FormComp = ({ currentID, setCurrentID }) => {
   };
 
   const onfinish = () => {
+    setCurrentID(0);
     setPostData({
       company_name: "",
       email: "",
@@ -52,98 +56,119 @@ const FormComp = ({ currentID, setCurrentID }) => {
       details: "",
       file: "",
     });
+
+    setChangeState(changeState + 1);
+
+    messageApi.open({
+      type: "loading",
+      content: "Post in progress..",
+      duration: 3,
+    }).then(() => message.success('Post Succesfully Added', 3))
   };
 
   return (
-    <Form
-      onFinish={onfinish}
-      style={{
-        backgroundColor: "white",
-        paddingTop: "20px",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        width: "100%",
-        borderRadius: "10px",
-      }}
-    >
-      <h1 style={{ marginTop: 0 }}>
-        {currentID ? "Edit data" : "List Your Company"}
-      </h1>
+    <>
+      {contextHolder}
 
-      <Input
-        name="company_name"
-        value={postData.company_name}
-        onChange={(e) =>
-          setPostData({ ...postData, company_name: e.target.value })
-        }
-        placeholder="Company Name"
-        style={{ width: "90%", margin: "10px 0" }}
-        required
-      />
-
-      <Input
-        name="email"
-        value={postData.email}
-        onChange={(e) => setPostData({ ...postData, email: e.target.value })}
-        placeholder="Email"
-        style={{ width: "90%", margin: "10px 0" }}
-      />
-
-      <Input
-        name="website"
-        value={postData.website}
-        onChange={(e) => setPostData({ ...postData, website: e.target.value })}
-        placeholder="website link"
-        style={{ width: "90%", margin: "10px 0" }}
-      />
-
-      <Input.TextArea
-        name="details"
-        value={postData.details}
-        onChange={(e) => {
-          setPostData({ ...postData, details: e.target.value });
-        }}
-        showCount
-        maxLength={10000}
+      <Form
+        onFinish={onfinish}
         style={{
-          width: "90%",
-          height: 120,
-          resize: "none ",
-          margin: "15px 0",
+          backgroundColor: "white",
+          paddingTop: "20px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          width: "100%",
+          borderRadius: "10px",
         }}
-        placeholder="company  discription"
-      />
+      >
+        <h1 style={{ marginTop: 0 }}>
+          {currentID ? "Edit data" : "List Your Company"}
+        </h1>
 
-      <div>
-        <FileBase64
-          type="file"
-          multiple={false}
-          onDone={({ base64 }) => {
-            console.log(base64);
-            setPostData({ ...postData, file: base64 });
-          }}
+        <Input
+          name="company_name"
+          value={postData.company_name}
+          onChange={(e) =>
+            setPostData({ ...postData, company_name: e.target.value })
+          }
+          placeholder="Company Name"
+          style={{ width: "90%", margin: "10px 0" }}
+          required
         />
-      </div>
 
-      <Button
-        type="primary"
-        htmlType="submit"
-        onClick={handleSubmit}
-        style={{ width: "90%", margin: "15px 0 10px" }}
-      >
-        Submit
-      </Button>
+        <Input
+          name="email"
+          value={postData.email}
+          onChange={(e) => setPostData({ ...postData, email: e.target.value })}
+          placeholder="Email"
+          style={{ width: "90%", margin: "10px 0" }}
+          required
+        />
 
-      <Button
-        onClick={clear}
-        type="primary"
-        htmlType="submit"
-        style={{ backgroundColor: "red", width: "90%", margin: "10px 0 30px" }}
-      >
-        clear
-      </Button>
-    </Form>
+        <Input
+          name="website"
+          value={postData.website}
+          onChange={(e) =>
+            setPostData({ ...postData, website: e.target.value })
+          }
+          placeholder="website link"
+          style={{ width: "90%", margin: "10px 0" }}
+          required
+        />
+
+        <Input.TextArea
+          name="details"
+          value={postData.details}
+          onChange={(e) => {
+            setPostData({ ...postData, details: e.target.value });
+          }}
+          showCount
+          maxLength={10000}
+          style={{
+            width: "90%",
+            height: 120,
+            resize: "none ",
+            margin: "15px 0",
+          }}
+          placeholder="company  discription"
+          required
+        />
+
+        <div>
+          <FileBase64
+            type="file"
+            multiple={false}
+            onDone={({ base64 }) => {
+              console.log(base64);
+              setPostData({ ...postData, file: base64 });
+            }}
+          />
+        </div>
+
+        <Button
+          type="primary"
+          htmlType="submit"
+          onClick={handleSubmit}
+          style={{ width: "90%", margin: "15px 0 10px" }}
+        >
+          Submit
+        </Button>
+
+        <Button
+          onClick={clear}
+          type="primary"
+          htmlType="submit"
+          style={{
+            backgroundColor: "red",
+            width: "90%",
+            margin: "10px 0 30px",
+          }}
+        >
+          clear
+        </Button>
+      </Form>
+    </>
   );
 };
 export default FormComp;
